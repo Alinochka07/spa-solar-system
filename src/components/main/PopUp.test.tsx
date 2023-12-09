@@ -9,8 +9,8 @@ describe('<Main />', () => {
     render(
       <Provider store={store}>
         <PopUp fractionName={''} fractionDescription={''} onNameClose={function (): void {
-                throw new Error('Function not implemented.');
-            } } solarSystemId={0} />
+          throw new Error('Function not implemented.');
+        } } solarSystemId={0} corporationId={0} popUpVisible={false}/>
       </Provider>
     );
 

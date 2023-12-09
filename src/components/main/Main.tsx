@@ -6,6 +6,7 @@ import { PopUp } from "./PopUp";
 interface MyFractionDataObject {
     fractionDescription: string,
     solar_system_id: number,
+    corporation_id: number,
 }
 
 
@@ -20,41 +21,46 @@ export const Main = (): ReactElement => {
         dispatch(fractionsFetch());
     }, [dispatch]);
 
-    const handleClosePopUp = () => {
-        setPopUpVisible(false);
-        setSelectedFraction(null);
-    }
-
-    const handleFractionClick = (fractionDescription: string, solar_system_id: number, event: MouseEvent<HTMLElement>) => {
-        setSelectedFraction({fractionDescription, solar_system_id});
+    const handleFractionClick = (fractionDescription: string, solar_system_id: number, corporation_id: number, event: MouseEvent<HTMLElement>) => {
+        setSelectedFraction({fractionDescription, solar_system_id, corporation_id});
         setPopUpVisible(true);
         event.stopPropagation();
     }
 
+    const handleClosePopUp = () => {
+      setPopUpVisible(false);
+  }
+
     return (
         <main className="bg-slate-600 flex">
           <div className="flex flex-wrap justify-center w-full mt-2.5" title="fraction-name">
-            {fractionData && fractionData.map(({ corporation_id, name, description, solar_system_id }) => {
+            {fractionData && 
+              fractionData.map(({ corporation_id, name, description, solar_system_id}) => {
               return (
                 <div
                   key={corporation_id}
-                  className="relative inline-block w-56 h-28 bg-black shadow-xl m-3 rounded-lg cursor-pointer"
+                  className="relative inline-block w-80 h-28 bg-black shadow-xl 
+                    m-3 rounded-lg"
                   onClick={(event) => {
-                    handleFractionClick(description, solar_system_id, event);
-                    setPopUpVisible(!popUpVisible);
+                    handleFractionClick(description, solar_system_id, corporation_id, event);
+                    // setPopUpVisible(!popUpVisible);
                 }}
                 >
-                  <div className="flex justify-center w-56 h-28 items-center">
+                  <div className="flex justify-center w-80 h-28 items-center cursor-pointer">
                     <h3 className="text-white text-center">{name}</h3>
                   </div>
-    
-                  { popUpVisible && selectedFraction?.fractionDescription === description && 
-                    selectedFraction?.solar_system_id === solar_system_id && (
+                  
+                  { popUpVisible &&
+                      selectedFraction?.fractionDescription === description &&
+                      selectedFraction?.solar_system_id === solar_system_id &&
+                      selectedFraction?.corporation_id === corporation_id && (
                     <PopUp
                         fractionName={name}
                         fractionDescription={description}
                         onNameClose={handleClosePopUp} 
-                        solarSystemId={solar_system_id}                 
+                        solarSystemId={solar_system_id}   
+                        corporationId={corporation_id} 
+                        popUpVisible={popUpVisible}           
                         />
                   )}
                 </div>
