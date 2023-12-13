@@ -14,12 +14,11 @@ export const initialState: FractionState = {
     data2: {},
     isLoading: false,
     error: "",
-} 
-
+}
 
 export const fractionsFetch = createAsyncThunk<any[], void>('fractions', async () => {
     try {
-        const data = await axios.get('https://esi.evetech.net/legacy/universe/factions/');
+        const data = await axios.get('https://esi.evetech.net/latest/universe/factions/');
         return data.data;
     } catch (error) {
         throw error;
@@ -61,6 +60,43 @@ export const raceFetch = createAsyncThunk<any | []>('races', async () => {
         throw error;
     }
 })
+
+export const alliancesFetch = createAsyncThunk<any | []>('alliances', async () => {
+    try {
+        const allianceData = await axios.get('https://esi.evetech.net/latest/alliances/');
+        return allianceData.data;
+    } catch (error) {
+        return Promise.reject({error: 'Failed to fetch alliances'})
+    }
+})
+
+export const alliancesByIdFetch = createAsyncThunk<any, number>('alliancesById', async (alliance_id: number, thunkAPI) => {
+    try {
+        const allianceData = await axios.get(`https://esi.evetech.net/latest/alliances/${alliance_id}`);
+        return allianceData.data;
+    } catch (error) {
+        return Promise.reject({error: 'Failed to fetch alliances by ID'})
+    }
+})
+
+export const constellationsFetch = createAsyncThunk<any | []>('constellations', async () => {
+    try {
+        const constellationData = await axios.get('https://esi.evetech.net/latest/universe/constellations/');
+        return constellationData.data;
+    } catch (error) {
+        return Promise.reject({error: 'Failed to fetch constellations'})
+    }
+})
+
+export const constellationsByIdFetch = createAsyncThunk<any, number>('constellations', async (constellations_id: number, thunkAPI) => {
+    try {
+        const constellationData = await axios.get(`https://esi.evetech.net/legacy/universe/constellations/${constellations_id}`);
+        return constellationData.data;
+    } catch (error) {
+        return Promise.reject({error: 'Failed to fetch constellations'})
+    }
+})
+
 
 const fractionSlicer = createSlice({
     name: 'fractions',
@@ -165,7 +201,91 @@ const raceSlicer = createSlice({
             state.error = action.error?.message;
         })
     },
-})
+});
+
+const allianceSlicer = createSlice({
+    name: 'alliances',
+    initialState,
+    reducers: {},
+    extraReducers(builder) {
+        builder.addCase(alliancesFetch.pending, (state) => {
+            state.isLoading = true;
+        })
+        builder.addCase(alliancesFetch.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(alliancesFetch.rejected, (state, action: any) => {
+            state.isLoading = false;
+            state.data = [];
+            state.error = action.error?.message;
+        })
+    },
+});
+
+const allianceByIdSlicer = createSlice({
+    name: 'alliancesByID',
+    initialState,
+    reducers: {},
+    extraReducers(builder) {
+        builder.addCase(alliancesByIdFetch.pending, (state) => {
+            state.isLoading = true;
+        })
+        builder.addCase(alliancesByIdFetch.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.data2 = action.payload;
+            state.error = null;
+        })
+        builder.addCase(alliancesByIdFetch.rejected, (state, action: any) => {
+            state.isLoading = false;
+            state.data2 = {};
+            state.error = action.error?.message;
+        })
+    },
+});
+
+const constellationSlicer = createSlice({
+    name: 'constellations',
+    initialState,
+    reducers: {},
+    extraReducers(builder) {
+        builder.addCase(constellationsFetch.pending, (state) => {
+            state.isLoading = true;
+        })
+        builder.addCase(constellationsFetch.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(constellationsFetch.rejected, (state, action: any) => {
+            state.isLoading = false;
+            state.data = [];
+            state.error = action.error?.message;
+        })
+    },
+});
+
+const constellationByIdSlicer = createSlice({
+    name: 'constellationsByID',
+    initialState,
+    reducers: {},
+    extraReducers(builder) {
+        builder.addCase(constellationsByIdFetch.pending, (state) => {
+            state.isLoading = true;
+        })
+        builder.addCase(constellationsByIdFetch.fulfilled, (state, action) => {
+            state.isLoading = false;
+            state.data2 = action.payload;
+            state.error = null;
+        })
+        builder.addCase(constellationsByIdFetch.rejected, (state, action: any) => {
+            state.isLoading = false;
+            state.data2 = {};
+            state.error = action.error?.message;
+        })
+    },
+});
 
 export const rootReducer = combineReducers({
     fractions: fractionSlicer.reducer,
@@ -173,6 +293,10 @@ export const rootReducer = combineReducers({
     corporations: corporationSlicer.reducer,
     characters: characterSlicer.reducer,
     races: raceSlicer.reducer,
+    alliances: allianceSlicer.reducer,
+    alliancesByIdD: allianceByIdSlicer.reducer,
+    constellations: constellationSlicer.reducer,
+    constellationsById: constellationByIdSlicer.reducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

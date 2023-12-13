@@ -6,10 +6,10 @@ import { Modal } from "./Modal";
 interface PopUpProps {
     fractionName: string;
     fractionDescription: string;
-    onNameClose: () => void;
     solarSystemId: number;
     corporationId: number;
     popUpVisible: boolean;
+    setPopUpVisible: (val: boolean) => void;
 }
 
 interface MyCorporationDataObject {
@@ -23,11 +23,11 @@ interface MyCorporationDataObject {
 
 export const PopUp = ({
         fractionName, 
-        fractionDescription, 
-        onNameClose, 
+        fractionDescription,  
         solarSystemId, 
         corporationId,
         popUpVisible,
+        setPopUpVisible
     }: PopUpProps): ReactElement => {
         const systemsData = useAppSelector((state) => state.systems.data2);
         const corporationsData = useAppSelector((state) => state.corporations.data2);
@@ -36,9 +36,11 @@ export const PopUp = ({
         const [showModal, setShowModal] = useState(false);
 
         useEffect(() => {
-            fetchSystem(solarSystemId);
-            fetchCorporation(corporationId);
-        }, [solarSystemId, corporationId]);
+            if (popUpVisible) {
+                fetchSystem(solarSystemId);
+                fetchCorporation(corporationId);
+              }
+            }, [popUpVisible, solarSystemId, corporationId]);
 
         const handleOpenModal = (corpName: string, memberCount: number, corpDescription: string, ceoId: number, event: React.MouseEvent<HTMLDivElement>) => {
             setChosenCorporation({corpName, memberCount, corpDescription, ceoId, event});
@@ -48,6 +50,7 @@ export const PopUp = ({
 
         const handleModalClose = () => {
             setShowModal(false);
+            setPopUpVisible(false)
         }
         
         return (
@@ -67,21 +70,15 @@ export const PopUp = ({
                                 corporationsData.ceo_id, event)}}>Corporation: {corporationsData.name}
                         </div>
                     </div>
-                    <div className="flex justify-center items-center">
-                        <button
-                            className="bg-black rounded-lg text-white w-full m-3"
-                            onClick={onNameClose}>Close
-                        </button>
-                    </div>
                         {showModal && chosenCorporation?.corpName === corporationsData.name && 
                         <Modal
                             corpName={corporationsData.name}
                             memberCount={corporationsData.member_count}
                             corpDescription={corporationsData.description}
-                            ceoId={corporationsData.ceo_id} 
-                            isOpen={true} 
+                            ceoId={corporationsData.ceo_id}
+                            isOpen={true}
                             onClose={handleModalClose} 
-                    /> }
+                            setShowModal={setShowModal} /> }
                 </section>
     )
     };

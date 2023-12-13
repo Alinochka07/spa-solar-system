@@ -8,9 +8,9 @@ describe('<Main />', () => {
   test('the text is in the document', () => {
     render(
       <Provider store={store}>
-        <PopUp fractionName={''} fractionDescription={''} onNameClose={function (): void {
+        <PopUp fractionName={''} fractionDescription={''} solarSystemId={0} corporationId={0} popUpVisible={false} setPopUpVisible={function (val: boolean): void {
           throw new Error('Function not implemented.');
-        } } solarSystemId={0} corporationId={0} popUpVisible={false}/>
+        } }/>
       </Provider>
     );
 
